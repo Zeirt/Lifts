@@ -26,5 +26,14 @@ public class Person extends Thread{
         this.start();
     }
     
+    public void run(){
+        while(position != destination){
+            controller.call(position);
+            controller.enterElevator();
+            controller.call(destination);
+            controller.exitElevator();
+        }
+    }
+    
     
 }

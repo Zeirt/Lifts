@@ -10,7 +10,17 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        EventBarrier[] floors = new EventBarrier[21];
+        Controller c = new Controller(null, null, floors);
+        Lift l1 = new Lift("l1", c);
+        Lift l2 = new Lift("l2", c);
+        c.setL1(l1);
+        c.setL2(l2);
+        l1.start();
+        l2.start();
+        c.start();
+        Printer sd = new Printer(c);
+        Person p = new Person("P1", 0, 20, c);
     }
     
 }
