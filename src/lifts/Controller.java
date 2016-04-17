@@ -1,6 +1,7 @@
 package lifts;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,12 +28,45 @@ public class Controller extends Thread{
         this.floors = floors;
     }
     
+    /**
+     * Set a Lift object as l1
+     * @param l1 lift to be set
+     */
     public void setL1(Lift l1){
         this.l1 = l1;
     }
     
+    /**
+     * Set a Lift object as l2
+     * @param l2 lift to be set
+     */
     public void setL2(Lift l2){
         this.l2 = l2;
+    }
+    
+    public void run(){
+        Random r = new Random();
+        boolean[] stopSwap;
+        while(true){
+            try {//Wait between 5 or 7 s
+                sleep(r.nextInt(7000 - 5000) + 5000);
+            } catch (InterruptedException e) {
+                System.out.println("InterruptedException caught in Controller run()");
+            }
+            if (l1.isWorking()) {
+                System.out.println("Lift1 breaks. L2 now in operation");
+                l1.breakLift();
+                stopSwap = l1.getStops();
+                l2.setStops(stopSwap);
+                l2.fixLift();
+            } else {
+                System.out.println("Lift2 breaks. L1 now in operation");
+                l2.breakLift();
+                stopSwap = l2.getStops();
+                l1.setStops(stopSwap);
+                l1.fixLift();
+            }
+        }
     }
     
     /**
@@ -62,10 +96,10 @@ public class Controller extends Thread{
     /**
      * Person gets inside elevator.
      */
-    public synchronized void enterElevator(){
+    public synchronized void enterElevator(Person p){
         if(l1.isWorking()){
-            l1.enter();
-        }else l2.enter();
+            l1.enter(p);
+        }else l2.enter(p);
     }
     
     /**
@@ -73,10 +107,10 @@ public class Controller extends Thread{
      */
     public synchronized void exitElevator(Person p){
         if(!l1.isEmpty()){
-            l1.exit();
+            l1.exit(p);
             p.setPosition(l1.getLiftLocation());
         }else{
-            l2.exit();
+            l2.exit(p);
             p.setPosition(l2.getLiftLocation());
         }
     }
@@ -92,7 +126,6 @@ public class Controller extends Thread{
             liftToUse = l1;
         } else liftToUse = l2;
         synchronized (this){
-            System.out.println("Is lift full?");
             while(liftToUse.isFull()){
                 try {
                     wait();//waits in controller

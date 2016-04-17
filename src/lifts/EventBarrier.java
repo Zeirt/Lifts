@@ -31,7 +31,7 @@ public class EventBarrier {
         }
         while(!event){
             try{
-                super.wait();//person will wait in controller's queue!
+                super.wait();//person will wait in this queue
             }catch (InterruptedException ie){
                 System.out.println("InterruptedException caught in EventBarrier arrive()");
             }
@@ -49,7 +49,7 @@ public class EventBarrier {
         notifyAll();
         while(peopleWaiting != 0){
             try{
-                super.wait();//lift will wait in controller's queue!
+                super.wait();//lift will wait in this queue
             }catch (InterruptedException ie){
                 System.out.println("InterruptedException caught in EventBarrier raiseArrival()");
             }

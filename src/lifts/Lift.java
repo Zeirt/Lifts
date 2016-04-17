@@ -1,8 +1,6 @@
 package lifts;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Goes up and down picking up people and leaving them in destination.
@@ -24,6 +22,7 @@ public class Lift extends Thread{
     private boolean doorsOpen;
     private int peopleInside;
     private boolean[] toStop = new boolean[21]; //list of requested stops
+    private ArrayList<Person> people = new ArrayList<>();
     
     /**
      * Constructor of Lift. Starts in floor 0, stopped.
@@ -44,8 +43,18 @@ public class Lift extends Thread{
         }
     }
     
+    /**
+     * Set the lift's status to broken.
+     */
     public void breakLift(){
         status = BROKEN;
+    }
+    
+    /**
+     * Set the lift's status to stopped if it was broken.
+     */
+    public void fixLift(){
+        if(status == BROKEN) status = STOPPED;
     }
     
     /**
@@ -101,6 +110,22 @@ public class Lift extends Thread{
     }
     
     /**
+     * Get the array of stops of the elevator
+     * @return array of stops
+     */
+    public boolean[] getStops(){
+        return toStop;
+    }
+    
+    /**
+     * Set an array of stops for the elevator
+     * @param stops must be a boolean[21] array
+     */
+    public void setStops(boolean[] stops){
+        toStop = stops;
+    }
+    
+    /**
      * Ask if elevator works at that moment.
      * @return true if it works. False if it's broken
      */
@@ -128,7 +153,7 @@ public class Lift extends Thread{
      * @param floor to wait in
      */
     public void requestFloor(int floor){
-        System.out.println("I got a request to get to floor " + floor);
+        System.out.println(id + " got a request to get to floor " + floor);
         synchronized(this){
             toStop[floor] = true;
             notifyAll();
@@ -139,17 +164,27 @@ public class Lift extends Thread{
     /**
      * Used by a person to enter the elevator and leave the floor
      */
-    public synchronized void enter(){
+    public synchronized void enter(Person p){
         peopleInside++;
+        people.add(p);
         controller.leaveFloor(position);
     }
     
     /**
      * Used by a person to leave the elevator.
      */
-    public synchronized void exit(){
+    public synchronized void exit(Person p){
         peopleInside--;
+        people.remove(p);
         controller.leaveFloor(position);
+    }
+    
+    public void kickPeopleOut(){
+        int notifyFloor;
+        for(int i = 0; i < people.size(); i++){
+            notifyFloor = people.get(i).getDestination();
+            controller.raiseArrivalInFloor(notifyFloor);
+        }
     }
     
     /**
@@ -252,9 +287,9 @@ public class Lift extends Thread{
         while(true){
             switch(status){
                 case STOPPED:{
-                    System.out.println("Lift opening doors");
+                    System.out.println(id + " opening doors");
                     openDoors();
-                    System.out.println("Lift closing doors");
+                    System.out.println(id + " closing doors");
                     closeDoors();
                     switch(lastDirection){
                         case GOING_UP: {
@@ -267,27 +302,27 @@ public class Lift extends Thread{
                         case GOING_DOWN: {
                             nextDestination = getNearestDestDown();
                             if (nextDestination == -1){//destination not valid
-                                System.out.println("Lift checking where to go");
+                                System.out.println(id + " checking where to go");
                                 nextDestination = getNearestDest();
-                                System.out.println("Lift decided where to go");
+                                System.out.println(id + " decided where to go");
                             }
                             break;
                         }
                     }
-                    System.out.println("Lift going to move");
+                    System.out.println(id + " going to move");
                     if(nextDestination > position) status = GOING_UP;
                     else status = GOING_DOWN;
                     break;
                 }
                 case GOING_UP: {
-                    while(position != nextDestination) {
+                    while(position != nextDestination && status != BROKEN) {
                         try {
                             sleep(500);
                         } catch (InterruptedException ex) {
                             System.out.println("InterruptedException caught in Lift " + id + " run() GOING_UP");
                         }
                         position++;
-                        System.out.println("Lift moved to floor " + position);
+                        System.out.println(id + " moved to floor " + position);
                     }
                     lastDirection = GOING_UP;
                     toStop[position] = false;
@@ -295,14 +330,14 @@ public class Lift extends Thread{
                     break;
                 }
                 case GOING_DOWN: {
-                    while(position != nextDestination) {
+                    while(position != nextDestination && status != BROKEN) {
                         try {
                             sleep(500);
                         } catch (InterruptedException ex) {
                             System.out.println("InterruptedException caught in Lift " + id + " run() GOING_DOWN");
                         }
                         position--;
-                        System.out.println("Lift moved to floor " + position);
+                        System.out.println(id + " moved to floor " + position);
                     }
                     lastDirection = GOING_DOWN;
                     toStop[position] = false;
@@ -310,7 +345,7 @@ public class Lift extends Thread{
                     break;
                 }
                 case BROKEN: {
-                    //do nothing for now
+                    kickPeopleOut();
                 }
             }
         }
