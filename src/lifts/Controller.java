@@ -71,10 +71,14 @@ public class Controller extends Thread{
     /**
      * Person gets out of elevator.
      */
-    public synchronized void exitElevator(){
+    public synchronized void exitElevator(Person p){
         if(!l1.isEmpty()){
             l1.exit();
-        }else l2.exit();
+            p.setPosition(l1.getLiftLocation());
+        }else{
+            l2.exit();
+            p.setPosition(l2.getLiftLocation());
+        }
     }
     
     /**

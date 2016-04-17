@@ -26,6 +26,14 @@ public class Person extends Thread{
         this.start();
     }
     
+    /**
+     * Position of the person is changed to proper floor
+     * @param position they're now in
+     */
+    public void setPosition(int position){
+        this.position = position;
+    }
+    
     public void run(){
         while(position != destination){
             System.out.println("I want lift to pick me up in floor " + position);
@@ -35,7 +43,7 @@ public class Person extends Thread{
             System.out.println("I want to go to floor " + destination);
             controller.call(destination);
             System.out.println("I'm leaving the elevator.");
-            controller.exitElevator();
+            controller.exitElevator(this);
         }
     }
     

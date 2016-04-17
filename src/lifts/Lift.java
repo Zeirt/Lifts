@@ -216,7 +216,7 @@ public class Lift extends Thread{
                     foundPos = down;
                 }
             }
-            if (found != false) {
+            if (!found) {
                 if (up == 20) {
                     up = position;
                     if (up == 20) {//if still 0, do nothing
@@ -252,7 +252,9 @@ public class Lift extends Thread{
         while(true){
             switch(status){
                 case STOPPED:{
+                    System.out.println("Lift opening doors");
                     openDoors();
+                    System.out.println("Lift closing doors");
                     closeDoors();
                     switch(lastDirection){
                         case GOING_UP: {
@@ -285,6 +287,7 @@ public class Lift extends Thread{
                             System.out.println("InterruptedException caught in Lift " + id + " run() GOING_UP");
                         }
                         position++;
+                        System.out.println("Lift moved to floor " + position);
                     }
                     lastDirection = GOING_UP;
                     toStop[position] = false;
@@ -299,6 +302,7 @@ public class Lift extends Thread{
                             System.out.println("InterruptedException caught in Lift " + id + " run() GOING_DOWN");
                         }
                         position--;
+                        System.out.println("Lift moved to floor " + position);
                     }
                     lastDirection = GOING_DOWN;
                     toStop[position] = false;
