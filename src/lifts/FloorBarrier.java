@@ -4,18 +4,18 @@ package lifts;
  * Handles events in a floor.
  * Keeps track of people waiting for the elevator and releases them when 
  * doors open, that is, an event is issued. 
- * Event also issued if elevator breaks.
+ * There is one FloorBarrier by floor and ONLY handles people wanting to get in.
  * @author Beatriz Cortés Sánchez
  */
-public class EventBarrier {
+public class FloorBarrier {
     
     private int peopleWaiting;
     private boolean event;
     
     /**
-     * Constructor of EventBarrier. Starts off empty with no events.
+     * Constructor of FloorBarrier. Starts off empty with no events.
      */
-    public EventBarrier(){
+    public FloorBarrier(){
         peopleWaiting = 0;
         event = false;
     }
@@ -33,7 +33,7 @@ public class EventBarrier {
             try{
                 super.wait();//person will wait in this queue
             }catch (InterruptedException ie){
-                System.out.println("InterruptedException caught in EventBarrier arrive()");
+                System.out.println("InterruptedException caught in FloorBarrier arrive()");
             }
         }
     }
@@ -52,7 +52,7 @@ public class EventBarrier {
             try{
                 super.wait();//lift will wait in this queue
             }catch (InterruptedException ie){
-                System.out.println("InterruptedException caught in EventBarrier raiseArrival()");
+                System.out.println("InterruptedException caught in FloorBarrier raiseArrival()");
             }
         }
         event = false;

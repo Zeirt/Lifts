@@ -14,7 +14,7 @@ public class Controller extends Thread{
     
     private Lift l1;
     private Lift l2;
-    private EventBarrier[] floors;
+    private FloorBarrier[] floors;
     
     /**
      * Constructor of Controller. Needs floors and lifts
@@ -22,7 +22,7 @@ public class Controller extends Thread{
      * @param l2 second lift
      * @param floors  array of floors
      */
-    public Controller(Lift l1, Lift l2, EventBarrier[] floors){
+    public Controller(Lift l1, Lift l2, FloorBarrier[] floors){
         this.l1 = l1;
         this.l2 = l2;
         this.floors = floors;
@@ -46,6 +46,7 @@ public class Controller extends Thread{
     
     public void run(){
         Random r = new Random();
+        boolean[] stopSwap;
         while(true){
             try {//Wait between 5 or 7 s
                 sleep(r.nextInt(7000 - 5000) + 5000);
@@ -55,10 +56,14 @@ public class Controller extends Thread{
             if (l1.isWorking()) {
                 System.out.println("Lift1 breaks. L2 now in operation");
                 l1.breakLift();
+                stopSwap = l1.getStops();
+                l2.setStops(stopSwap);
                 l2.fixLift();
             } else {
                 System.out.println("Lift2 breaks. L1 now in operation");
                 l2.breakLift();
+                stopSwap = l2.getStops();
+                l1.setStops(stopSwap);
                 l1.fixLift();
             }
         }
@@ -90,11 +95,16 @@ public class Controller extends Thread{
     
     /**
      * Person gets inside elevator.
+     * @return String of ID of lift they're in
      */
-    public synchronized void enterElevator(Person p){
+    public synchronized Lift enterElevator(Person p){
         if(l1.isWorking()){
             l1.enter(p);
-        }else l2.enter(p);
+            return l1;
+        }else{
+            l2.enter(p);
+            return l2;
+        }
     }
     
     /**
@@ -130,6 +140,16 @@ public class Controller extends Thread{
             }
         }
         liftToUse.requestFloor(floor);
+    }
+    
+    /**
+     * Request an elevator the person is in to go to a floor.
+     * Person waits in elevator until it arrives.
+     * @param floor 
+     */
+    public void requestStop(int floor){
+        if(l1.isWorking()) l1.requestStop(floor);
+        else l2.requestStop(floor);
     }
     
      public void drawState() {

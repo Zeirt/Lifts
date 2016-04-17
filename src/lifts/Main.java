@@ -14,9 +14,9 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        EventBarrier[] floors = new EventBarrier[21];
+        FloorBarrier[] floors = new FloorBarrier[21];
         for(int i = 0; i <= 20; i++){
-            floors[i] = new EventBarrier();
+            floors[i] = new FloorBarrier();
         }
         Controller c = new Controller(null, null, floors);
         Lift l1 = new Lift("l1", c);
