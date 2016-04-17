@@ -46,7 +46,6 @@ public class Controller extends Thread{
     
     public void run(){
         Random r = new Random();
-        boolean[] stopSwap;
         while(true){
             try {//Wait between 5 or 7 s
                 sleep(r.nextInt(7000 - 5000) + 5000);
@@ -56,14 +55,10 @@ public class Controller extends Thread{
             if (l1.isWorking()) {
                 System.out.println("Lift1 breaks. L2 now in operation");
                 l1.breakLift();
-                stopSwap = l1.getStops();
-                l2.setStops(stopSwap);
                 l2.fixLift();
             } else {
                 System.out.println("Lift2 breaks. L1 now in operation");
                 l2.breakLift();
-                stopSwap = l2.getStops();
-                l1.setStops(stopSwap);
                 l1.fixLift();
             }
         }

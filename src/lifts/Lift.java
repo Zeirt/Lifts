@@ -110,22 +110,6 @@ public class Lift extends Thread{
     }
     
     /**
-     * Get the array of stops of the elevator
-     * @return array of stops
-     */
-    public boolean[] getStops(){
-        return toStop;
-    }
-    
-    /**
-     * Set an array of stops for the elevator
-     * @param stops must be a boolean[21] array
-     */
-    public void setStops(boolean[] stops){
-        toStop = stops;
-    }
-    
-    /**
      * Ask if elevator works at that moment.
      * @return true if it works. False if it's broken
      */
@@ -180,9 +164,11 @@ public class Lift extends Thread{
     }
     
     public void kickPeopleOut(){
+        System.out.println(id + " is going to kick people out");
         int notifyFloor;
         for(int i = 0; i < people.size(); i++){
             notifyFloor = people.get(i).getDestination();
+            doorsOpen = true;
             controller.raiseArrivalInFloor(notifyFloor);
         }
     }

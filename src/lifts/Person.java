@@ -52,7 +52,9 @@ public class Person extends Thread{
             controller.call(destination);
             System.out.println("I'm leaving the elevator.");
             controller.exitElevator(this);
+            System.out.println("I'm in floor " + position);
         }
+        System.out.println("I'm going to end.");
     }
     
     

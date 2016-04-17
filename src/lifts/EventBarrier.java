@@ -46,6 +46,7 @@ public class EventBarrier {
             return;
         }
         event = true;
+        System.out.println("Lift has arrived");
         notifyAll();
         while(peopleWaiting != 0){
             try{
@@ -62,6 +63,7 @@ public class EventBarrier {
      */
     public synchronized void exit(){
         peopleWaiting--;
+        System.out.println("Person is not waiting anymore.");
         if(peopleWaiting == 0){//if nobody's waiting to get in, tell
             notifyAll();
         }
