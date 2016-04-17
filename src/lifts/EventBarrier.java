@@ -25,6 +25,7 @@ public class EventBarrier {
      */
     public synchronized void arrive(){
         peopleWaiting++;
+        System.out.println("Person is now waiting for lift.");
         if(event){
             return;
         }

@@ -88,6 +88,7 @@ public class Controller extends Thread{
             liftToUse = l1;
         } else liftToUse = l2;
         synchronized (this){
+            System.out.println("Is lift full?");
             while(liftToUse.isFull()){
                 try {
                     wait();//waits in controller
@@ -108,7 +109,7 @@ public class Controller extends Thread{
         System.out.println("Floor:  Lift1:   Lift2:   ButtonPressed?:    Destination: ");
         for (int i = 20; i >= 0; i--) {
             if (l1.getLiftLocation() == i) {
-                if (l1.getStatus() != 'N') {
+                if (l1.getStatus() != 3) {
                     toDrawL1 = "" + l1.getStatus() + "#" + l1.getPeopleInside();
                 } else {
                     toDrawL1 = "" + l1.getStatus();

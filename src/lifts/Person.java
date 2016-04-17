@@ -28,9 +28,13 @@ public class Person extends Thread{
     
     public void run(){
         while(position != destination){
+            System.out.println("I want lift to pick me up in floor " + position);
             controller.call(position);
+            System.out.println("I'm going to enter the elevator.");
             controller.enterElevator();
+            System.out.println("I want to go to floor " + destination);
             controller.call(destination);
+            System.out.println("I'm leaving the elevator.");
             controller.exitElevator();
         }
     }

@@ -44,6 +44,10 @@ public class Lift extends Thread{
         }
     }
     
+    public void breakLift(){
+        status = BROKEN;
+    }
+    
     /**
      * Signal incoming and outcoming people that doors are open.
      */
@@ -124,6 +128,7 @@ public class Lift extends Thread{
      * @param floor to wait in
      */
     public void requestFloor(int floor){
+        System.out.println("I got a request to get to floor " + floor);
         synchronized(this){
             toStop[floor] = true;
             notifyAll();
@@ -205,7 +210,7 @@ public class Lift extends Thread{
                     foundPos = down;
                 }
             } else {
-                down = position;
+                down--;
                 if (toStop[down] == true) {
                     found = true;
                     foundPos = down;
@@ -221,7 +226,7 @@ public class Lift extends Thread{
                         foundPos = up;
                     }
                 } else {
-                    up = position;
+                    up++;
                     if (toStop[up] == true) {
                         found = true;
                         foundPos = up;
@@ -260,11 +265,14 @@ public class Lift extends Thread{
                         case GOING_DOWN: {
                             nextDestination = getNearestDestDown();
                             if (nextDestination == -1){//destination not valid
+                                System.out.println("Lift checking where to go");
                                 nextDestination = getNearestDest();
+                                System.out.println("Lift decided where to go");
                             }
                             break;
                         }
                     }
+                    System.out.println("Lift going to move");
                     if(nextDestination > position) status = GOING_UP;
                     else status = GOING_DOWN;
                     break;
@@ -296,6 +304,9 @@ public class Lift extends Thread{
                     toStop[position] = false;
                     status = STOPPED;
                     break;
+                }
+                case BROKEN: {
+                    //do nothing for now
                 }
             }
         }
