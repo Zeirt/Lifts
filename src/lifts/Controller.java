@@ -1,10 +1,5 @@
 package lifts;
 
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * Manages both lifts.
  * Records calls from floors and manages breaking-fixing of the lifts.
@@ -15,6 +10,8 @@ public class Controller extends Thread{
     private Lift l1;
     private Lift l2;
     private FloorBarrier[] floors;
+    private LiftBarrier bl1;
+    private LiftBarrier bl2;
     
     /**
      * Constructor of Controller. Needs floors and lifts
@@ -26,47 +23,16 @@ public class Controller extends Thread{
         this.l1 = l1;
         this.l2 = l2;
         this.floors = floors;
+        bl1 = new LiftBarrier();
+        bl2 = new LiftBarrier();
     }
     
-    /**
-     * Set a Lift object as l1
-     * @param l1 lift to be set
-     */
     public void setL1(Lift l1){
         this.l1 = l1;
     }
     
-    /**
-     * Set a Lift object as l2
-     * @param l2 lift to be set
-     */
     public void setL2(Lift l2){
         this.l2 = l2;
-    }
-    
-    public void run(){
-        Random r = new Random();
-        boolean[] stopSwap;
-        while(true){
-            try {//Wait between 5 or 7 s
-                sleep(r.nextInt(7000 - 5000) + 5000);
-            } catch (InterruptedException e) {
-                System.out.println("InterruptedException caught in Controller run()");
-            }
-            if (l1.isWorking()) {
-                System.out.println("Lift1 breaks. L2 now in operation");
-                l1.breakLift();
-                stopSwap = l1.getStops();
-                l2.setStops(stopSwap);
-                l2.fixLift();
-            } else {
-                System.out.println("Lift2 breaks. L1 now in operation");
-                l2.breakLift();
-                stopSwap = l2.getStops();
-                l1.setStops(stopSwap);
-                l1.fixLift();
-            }
-        }
     }
     
     /**
@@ -75,6 +41,13 @@ public class Controller extends Thread{
      */
    public void arriveInFloor(int floor){
        floors[floor].arrive();
+   }
+   
+   public void arriveInLift(int floor){
+       if(l1.isWorking()){
+           bl1.arrive(floor);
+       }
+       else bl2.arrive(floor);
    }
    
    /**
@@ -95,15 +68,15 @@ public class Controller extends Thread{
     
     /**
      * Person gets inside elevator.
-     * @return String of ID of lift they're in
+     * @return id of elevator they're in.
      */
-    public synchronized Lift enterElevator(Person p){
+    public synchronized String enterElevator(){
         if(l1.isWorking()){
-            l1.enter(p);
-            return l1;
+            l1.enter();
+            return "l2";
         }else{
-            l2.enter(p);
-            return l2;
+            l2.enter();
+            return "l1";
         }
     }
     
@@ -112,10 +85,10 @@ public class Controller extends Thread{
      */
     public synchronized void exitElevator(Person p){
         if(!l1.isEmpty()){
-            l1.exit(p);
+            l1.exit();
             p.setPosition(l1.getLiftLocation());
         }else{
-            l2.exit(p);
+            l2.exit();
             p.setPosition(l2.getLiftLocation());
         }
     }
@@ -142,14 +115,12 @@ public class Controller extends Thread{
         liftToUse.requestFloor(floor);
     }
     
-    /**
-     * Request an elevator the person is in to go to a floor.
-     * Person waits in elevator until it arrives.
-     * @param floor 
-     */
-    public void requestStop(int floor){
-        if(l1.isWorking()) l1.requestStop(floor);
-        else l2.requestStop(floor);
+    public void callStop(int floor, String liftToUse){
+        Lift l;
+        if(liftToUse.equals("l1")){
+            l = l1;
+        } else l = l2;
+        l.requestStop(floor);
     }
     
      public void drawState() {
@@ -179,12 +150,12 @@ public class Controller extends Thread{
                 toDrawL2 = "|";
             }
             if (l1.isWorking()) {
-                if (l1.isStopCalled(i)) {
+                if (l1.isRideCalled(i)) {
                     toDrawButton = "Yes";
                 } else {
                     toDrawButton = "No";
                 }
-            } else if (l2.isStopCalled(i)) {
+            } else if (l2.isRideCalled(i)) {
                 toDrawButton = "Yes";
             } else {
                 toDrawButton = "No";

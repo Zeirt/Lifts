@@ -27,7 +27,7 @@ public class Main {
         l1.start();
         l2.start();
         c.start();
-        //Printer sd = new Printer(c);
+        Printer sd = new Printer(c);
         Person p = new Person("P1", 6, 20, c);
         try {
             sleep(500);

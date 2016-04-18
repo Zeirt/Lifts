@@ -4,7 +4,7 @@ package lifts;
  * Handles events in a floor.
  * Keeps track of people waiting for the elevator and releases them when 
  * doors open, that is, an event is issued. 
- * There is one FloorBarrier by floor and ONLY handles people wanting to get in.
+ * This is only used for people to get INSIDE the elevator.
  * @author Beatriz Cortés Sánchez
  */
 public class FloorBarrier {
@@ -31,7 +31,7 @@ public class FloorBarrier {
         }
         while(!event){
             try{
-                super.wait();//person will wait in this queue
+                this.wait();//person will wait in queue!
             }catch (InterruptedException ie){
                 System.out.println("InterruptedException caught in FloorBarrier arrive()");
             }
@@ -46,11 +46,10 @@ public class FloorBarrier {
             return;
         }
         event = true;
-        System.out.println("Lift has arrived");
         notifyAll();
         while(peopleWaiting != 0){
             try{
-                super.wait();//lift will wait in this queue
+                this.wait();//lift will wait in queue!
             }catch (InterruptedException ie){
                 System.out.println("InterruptedException caught in FloorBarrier raiseArrival()");
             }
@@ -63,7 +62,6 @@ public class FloorBarrier {
      */
     public synchronized void exit(){
         peopleWaiting--;
-        System.out.println("Person is not waiting anymore.");
         if(peopleWaiting == 0){//if nobody's waiting to get in, tell
             notifyAll();
         }
