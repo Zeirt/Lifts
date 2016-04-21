@@ -2,24 +2,26 @@ package lifts;
 
 /**
  * Spawns in a floor and calls the lift to go to destination.
+ *
  * @author Beatriz Cortés Sánchez
  */
-public class Person extends Thread{
-    
+public class Person extends Thread {
+
     private String id;
     private int position;
     private int destination;
     private Controller controller;
     private String liftRef;
-    
+
     /**
-     * Constructor of Person. 
+     * Constructor of Person.
+     *
      * @param id identifier of person
      * @param position starting floor
      * @param destination floor person wants to go to
      * @param controller reference to controller
      */
-    public Person(String id, int position, int destination, Controller controller){
+    public Person(String id, int position, int destination, Controller controller) {
         this.id = id;
         this.position = position;
         this.destination = destination;
@@ -27,27 +29,27 @@ public class Person extends Thread{
         liftRef = "";
         this.start();
     }
-    
+
     /**
      * Position of the person is changed to proper floor
+     *
      * @param position they're now in
      */
-    public void setPosition(int position){
+    public void setPosition(int position) {
         this.position = position;
     }
-    
-    public void run(){
-        while(position != destination){
+
+    public void run() {
+        while (position != destination) {
             System.out.println("I want lift to pick me up in floor " + position);
             controller.call(position);
             System.out.println("I'm going to enter the elevator.");
             liftRef = controller.enterElevator();
             System.out.println("I want to go to floor " + destination);
-            controller.call(destination);
+            controller.callStop(destination, liftRef);
             System.out.println("I'm leaving the elevator.");
-            controller.exitElevator(this);
+            controller.exitElevator(this, destination);
         }
     }
-    
-    
+
 }
