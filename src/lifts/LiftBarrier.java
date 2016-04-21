@@ -39,7 +39,7 @@ public class LiftBarrier {
         if ((event && (floorReached == stop)) || (event && broken)) {
             return;
         }
-        while ((!event && (floorReached == stop)) || (!event && broken)) {//leave when they get to stop OR lift broken
+        while ((!event && (floorReached != stop)) || (!event && !broken)) {//leave when they get to stop OR lift broken
             try {
                 this.wait();//person will wait in queue!
             } catch (InterruptedException ie) {
@@ -115,7 +115,7 @@ public class LiftBarrier {
      */
     private int peopleGettingOffThisFloor() {
         int result = 0;
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < peopleWaiting.size(); i++) {
             if (peopleWaiting.isEmpty()) {
                 return 0;
             }

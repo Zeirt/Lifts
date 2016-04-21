@@ -77,7 +77,7 @@ public class Lift extends Thread {
     /**
      * Set an array of rides for the elevator
      *
-     * @param stops must be a boolean[21] array
+     * @param rides be a boolean[21] array
      */
     public void setRides(boolean[] rides) {
         toRide = rides;
@@ -340,6 +340,9 @@ public class Lift extends Thread {
                     openDoors();
                     System.out.println("Lift closing doors");
                     closeDoors();
+                    if (status == BROKEN) {
+                        break;//if broken, get out of here
+                    }
                     switch (lastDirection) {
                         case GOING_UP: {
                             nextDestination = getNearestDestUp();
@@ -358,10 +361,19 @@ public class Lift extends Thread {
                             break;
                         }
                     }
+                    if (status == BROKEN) {
+                        break;//if broken, get out of here
+                    }
                     System.out.println("Lift going to move");
                     if (nextDestination > position) {
+                        if (status == BROKEN) {
+                            break;//if broken, get out of here
+                        }
                         status = GOING_UP;
                     } else {
+                        if (status == BROKEN) {
+                            break;//if broken, get out of here
+                        }
                         status = GOING_DOWN;
                     }
                     break;
