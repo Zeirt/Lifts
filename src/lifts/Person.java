@@ -63,14 +63,14 @@ public class Person extends Thread {
      * elevator signals to.
      */
     public void run() {
-        while (position != destination) {
-            System.out.println("I want lift to pick me up in floor " + position);
+        while (position != destination && !controller.areMovementsExhausted()) {
+            //System.out.println("I want lift to pick me up in floor " + position);
             controller.call(position);
-            System.out.println("I'm going to enter the elevator.");
+            //System.out.println("I'm going to enter the elevator.");
             liftRef = controller.enterElevator(this);
-            System.out.println("I want to go to floor " + destination);
+            //System.out.println("I want to go to floor " + destination);
             controller.callStop(destination, liftRef);
-            System.out.println("I'm leaving the elevator.");
+            //System.out.println("I'm leaving the elevator.");
             controller.exitElevator(this, destination);
         }
     }

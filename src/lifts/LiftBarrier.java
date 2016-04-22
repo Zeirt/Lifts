@@ -35,7 +35,7 @@ public class LiftBarrier {
      */
     public synchronized void arrive(int stop) {
         peopleWaiting.add(stop);
-        System.out.println("Person is now waiting for stop " + stop);
+        //System.out.println("Person is now waiting for stop " + stop);
         if ((event && (floorReached == stop)) || (event && broken)) {
             return;
         }

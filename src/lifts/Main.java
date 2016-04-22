@@ -1,11 +1,12 @@
 package lifts;
 
 import static java.lang.Thread.sleep;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Random;
 
 /**
- * Spawns 20 floors, a controller, two lifts, a printer and begins to spawn people randomly on floors.
+ * Spawns 20 floors, a controller, two lifts, a printer and begins to spawn
+ * people randomly on floors.
+ *
  * @author Beatriz Cortés Sánchez
  */
 public class Main {
@@ -15,7 +16,7 @@ public class Main {
      */
     public static void main(String[] args) {
         FloorBarrier[] floors = new FloorBarrier[21];
-        for(int i = 0; i <= 20; i++){
+        for (int i = 0; i <= 20; i++) {
             floors[i] = new FloorBarrier();
         }
         Controller c = new Controller(null, null, floors);
@@ -28,13 +29,16 @@ public class Main {
         l2.start();
         c.start();
         Printer sd = new Printer(c);
-        Person p = new Person("P1", 6, 20, c);
-        try {
-            sleep(500);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        Random r = new Random();
+        //make a random person every 0.5s
+        for (int i = 1; i <= 100; i++) {
+            new Person("P" + i, r.nextInt(20), r.nextInt(20), c);
+            try {
+                sleep(500);
+            } catch (InterruptedException ex) {
+                System.out.println("InterruptedException caught in Main main()");
+            }
         }
-        Person pe = new Person("P2", 9, 19, c);
     }
-    
+
 }

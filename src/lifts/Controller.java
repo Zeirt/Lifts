@@ -15,6 +15,7 @@ public class Controller extends Thread {
     private FloorBarrier[] floors;
     private LiftBarrier bl1;
     private LiftBarrier bl2;
+    private int movementsDone;//will count until 100 to finish
 
     /**
      * Constructor of Controller. Needs floors and lifts
@@ -29,6 +30,23 @@ public class Controller extends Thread {
         this.floors = floors;
         bl1 = new LiftBarrier();
         bl2 = new LiftBarrier();
+        movementsDone = 0;
+    }
+
+    /**
+     * Increase the movements done by 1
+     */
+    public void movementUp() {
+        movementsDone++;
+    }
+
+    /**
+     * Check if lift should terminate
+     *
+     * @return true if movements are >100, else false
+     */
+    public boolean areMovementsExhausted() {
+        return movementsDone >= 100;
     }
 
     /**
@@ -139,11 +157,25 @@ public class Controller extends Thread {
      */
     public synchronized String enterElevator(Person p) {
         if (l1.isWorking()) {
+            while (l1.isFull()) {
+                try {
+                    this.wait();
+                } catch (InterruptedException ex) {
+                    System.out.println("InterruptedException caught in Controller enterElevator()");
+                }
+            }
             l1.enter(p);
-            return "l2";
-        } else {
-            l2.enter(p);
             return "l1";
+        } else {
+            while (l2.isFull()) {
+                try {
+                    this.wait();
+                } catch (InterruptedException ex) {
+                    System.out.println("InterruptedException caught in Controller enterElevator()");
+                }
+            }
+            l2.enter(p);
+            return "l2";
         }
     }
 
@@ -209,21 +241,21 @@ public class Controller extends Thread {
     public void run() {
         Random r = new Random();
         boolean[] stopSwap;
-        while (true) {
+        while (!areMovementsExhausted()) {
             try {//Wait between 5 or 7 s
                 sleep(r.nextInt(7000 - 5000) + 5000);
             } catch (InterruptedException e) {
                 System.out.println("InterruptedException caught in Controller run()");
             }
             if (l1.isWorking()) {
-                System.out.println("Lift1 breaks. L2 now in operation");
+                //System.out.println("Lift1 breaks. L2 now in operation");
                 l1.breakLift();
                 stopSwap = l1.getRides();
                 l2.setRides(stopSwap);
                 l2.fixLift();
                 bl2.fixLift();
             } else {
-                System.out.println("Lift2 breaks. L1 now in operation");
+                //System.out.println("Lift2 breaks. L1 now in operation");
                 l2.breakLift();
                 stopSwap = l2.getRides();
                 l1.setRides(stopSwap);

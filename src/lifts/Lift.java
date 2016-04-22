@@ -214,7 +214,7 @@ public class Lift extends Thread {
      * @param floor to wait in
      */
     public void requestFloor(int floor) {
-        System.out.println("I got a request to get to floor " + floor);
+        //System.out.println("I got a request to get to floor " + floor);
         synchronized (this) {
             toRide[floor] = true;
             notifyAll();
@@ -228,7 +228,7 @@ public class Lift extends Thread {
      * @param floor to get off at
      */
     public void requestStop(int floor) {
-        System.out.println("Someone wants to get off at floor " + floor);
+        //System.out.println("Someone wants to get off at floor " + floor);
         synchronized (this) {
             toStop[floor] = true;
             notifyAll();
@@ -390,12 +390,12 @@ public class Lift extends Thread {
      * it's fixed back to stopped.
      */
     public void run() {
-        while (true) {
+        while (!controller.areMovementsExhausted()) {
             switch (status) {
                 case STOPPED: {
-                    System.out.println("Lift opening doors");
+                    //System.out.println("Lift opening doors");
                     openDoors();
-                    System.out.println("Lift closing doors");
+                    //System.out.println("Lift closing doors");
                     closeDoors();
                     if (status == BROKEN) {
                         break;//if broken, get out of here
@@ -411,9 +411,9 @@ public class Lift extends Thread {
                         case GOING_DOWN: {
                             nextDestination = getNearestDestDown();
                             if (nextDestination == -1) {//destination not valid
-                                System.out.println("Lift checking where to go");
+                                //System.out.println("Lift checking where to go");
                                 nextDestination = getNearestDest();
-                                System.out.println("Lift decided where to go");
+                                //System.out.println("Lift decided where to go");
                             }
                             break;
                         }
@@ -421,7 +421,7 @@ public class Lift extends Thread {
                     if (status == BROKEN) {
                         break;//if broken, get out of here
                     }
-                    System.out.println("Lift going to move");
+                    //System.out.println("Lift going to move");
                     if (nextDestination > position) {
                         if (status == BROKEN) {
                             break;//if broken, get out of here
@@ -436,14 +436,15 @@ public class Lift extends Thread {
                     break;
                 }
                 case GOING_UP: {
-                    while (position != nextDestination) {
+                    while (position != nextDestination && status != BROKEN && !controller.areMovementsExhausted()) {
                         try {
                             sleep(500);
                         } catch (InterruptedException ex) {
                             System.out.println("InterruptedException caught in Lift " + id + " run() GOING_UP");
                         }
                         position++;
-                        System.out.println("Lift moved to floor " + position);
+                        controller.movementUp();
+                        //System.out.println("Lift moved to floor " + position);
                     }
                     lastDirection = GOING_UP;
                     toStop[position] = false;
@@ -452,14 +453,15 @@ public class Lift extends Thread {
                     break;
                 }
                 case GOING_DOWN: {
-                    while (position != nextDestination) {
+                    while (position != nextDestination && status != BROKEN && !controller.areMovementsExhausted()) {
                         try {
                             sleep(500);
                         } catch (InterruptedException ex) {
                             System.out.println("InterruptedException caught in Lift " + id + " run() GOING_DOWN");
                         }
                         position--;
-                        System.out.println("Lift moved to floor " + position);
+                        controller.movementUp();
+                        //System.out.println("Lift moved to floor " + position);
                     }
                     lastDirection = GOING_DOWN;
                     toStop[position] = false;
