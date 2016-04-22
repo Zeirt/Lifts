@@ -39,12 +39,35 @@ public class Person extends Thread {
         this.position = position;
     }
 
+    /**
+     * Ask for this person's destination
+     *
+     * @return destination
+     */
+    public int getDestination() {
+        return destination;
+    }
+
+    /**
+     * Ask for a person's ID
+     *
+     * @return id
+     */
+    public String getPersonId() {
+        return id;
+    }
+
+    /**
+     * Until it reaches the destination, a person will call the lift, enter it
+     * when it arrives, tell the lift where they want to go and leave once the
+     * elevator signals to.
+     */
     public void run() {
         while (position != destination) {
             System.out.println("I want lift to pick me up in floor " + position);
             controller.call(position);
             System.out.println("I'm going to enter the elevator.");
-            liftRef = controller.enterElevator();
+            liftRef = controller.enterElevator(this);
             System.out.println("I want to go to floor " + destination);
             controller.callStop(destination, liftRef);
             System.out.println("I'm leaving the elevator.");

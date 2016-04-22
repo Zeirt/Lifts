@@ -1,8 +1,6 @@
 package lifts;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Goes up and down picking up people and leaving them in destination. If it
@@ -27,6 +25,7 @@ public class Lift extends Thread {
     private int peopleInside;
     private boolean[] toRide = new boolean[21]; //list of requested rides
     private boolean[] toStop = new boolean[21]; //list of requested stops
+    private ArrayList<Person> people = new ArrayList<>();//list of people inside to log
 
     /**
      * Constructor of Lift. Starts in floor 0, stopped.
@@ -141,6 +140,26 @@ public class Lift extends Thread {
     }
 
     /**
+     * Get current status of elevator as a char
+     *
+     * @return 'S' = STOPPED, 'U' = GOING_UP, 'D' = GOING_DOWN, 'N' = BROKEN
+     */
+    public char getStatusChar() {
+        switch (status) {
+            case STOPPED:
+                return 'S';
+            case GOING_UP:
+                return 'U';
+            case GOING_DOWN:
+                return 'D';
+            case BROKEN:
+                return 'N';
+            default:
+                return 'W';//if this happens, we have a problem
+        }
+    }
+
+    /**
      * Get if call to that ride is called.
      *
      * @param floor to look in
@@ -176,6 +195,11 @@ public class Lift extends Thread {
         }
     }
 
+    /**
+     * Ask if the elevator is empty
+     *
+     * @return true if empty, false otherwise
+     */
     public boolean isEmpty() {
         if (peopleInside == 0) {
             return true;
@@ -214,9 +238,12 @@ public class Lift extends Thread {
 
     /**
      * Used by a person to enter the elevator and leave the floor
+     *
+     * @param p person to get inside
      */
-    public synchronized void enter() {
+    public synchronized void enter(Person p) {
         peopleInside++;
+        people.add(p);
         controller.leaveFloor(position);
     }
 
@@ -224,9 +251,11 @@ public class Lift extends Thread {
      * Used by a person to leave the elevator.
      *
      * @param floor they wanted to leave in
+     * @param p person to get outside
      */
-    public synchronized void exit(int floor) {
+    public synchronized void exit(int floor, Person p) {
         peopleInside--;
+        people.remove(p);
         controller.leaveLift(id, floor);
     }
 
@@ -332,6 +361,34 @@ public class Lift extends Thread {
         return false;
     }
 
+    /**
+     * Get a string with the IDs of people wanting to get off at that floor.
+     *
+     * @param floor to check
+     * @return ordered string of people (P1, P3, P5...)
+     */
+    public String getListOfPeopleToStop(int floor) {
+        String result = "";
+        for (int i = 0; i < people.size(); i++) {
+            if (people.get(i).getDestination() == floor) {
+                result = result + people.get(i).getPersonId() + " ";
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Run method separated in several status. When stopped, it will open doors
+     * and then close them once people have finished going in and out. After
+     * that, it will check where to go, based on if's last gone up or down. If,
+     * at any point it notices it's broken, it will break out of this behavior.
+     * Once it's found a destination, it will set the status as up or down When
+     * going up, it will wait 0.5s and then increase the floor it's in. It will
+     * stop if it's broken or when it's reached its destination. The behaviour
+     * is basically the same when going down. If it breaks, it will open the
+     * doors, issuing that it's broken to kick everyone out, and then wait until
+     * it's fixed back to stopped.
+     */
     public void run() {
         while (true) {
             switch (status) {

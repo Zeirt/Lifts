@@ -80,6 +80,12 @@ public class Controller extends Thread {
         floors[floor].exit();
     }
 
+    /**
+     * Person gets out of lift
+     *
+     * @param id of lift
+     * @param floor they wanted to get off at
+     */
     public void leaveLift(String id, int floor) {
         if (id.equals("l1")) {
             bl1.exit(floor);
@@ -128,14 +134,15 @@ public class Controller extends Thread {
     /**
      * Person gets inside elevator.
      *
+     * @param p to go inside
      * @return id of elevator they're in.
      */
-    public synchronized String enterElevator() {
+    public synchronized String enterElevator(Person p) {
         if (l1.isWorking()) {
-            l1.enter();
+            l1.enter(p);
             return "l2";
         } else {
-            l2.enter();
+            l2.enter(p);
             return "l1";
         }
     }
@@ -145,10 +152,10 @@ public class Controller extends Thread {
      */
     public synchronized void exitElevator(Person p, int floor) {
         if (!l1.isEmpty()) {
-            l1.exit(floor);
+            l1.exit(floor, p);
             p.setPosition(l1.getLiftLocation());
         } else {
-            l2.exit(floor);
+            l2.exit(floor, p);
             p.setPosition(l2.getLiftLocation());
         }
     }
@@ -195,6 +202,10 @@ public class Controller extends Thread {
         l.requestStop(floor);
     }
 
+    /**
+     * After waiting between 5 or 7 seconds, it will break a lift and fix the
+     * other, swapping the rides left.
+     */
     public void run() {
         Random r = new Random();
         boolean[] stopSwap;
@@ -232,18 +243,18 @@ public class Controller extends Thread {
         for (int i = 20; i >= 0; i--) {
             if (l1.getLiftLocation() == i) {
                 if (l1.getStatus() != 3) {
-                    toDrawL1 = "" + l1.getStatus() + "#" + l1.getPeopleInside();
+                    toDrawL1 = "" + l1.getStatusChar() + "#" + l1.getPeopleInside();
                 } else {
-                    toDrawL1 = "" + l1.getStatus();
+                    toDrawL1 = "" + l1.getStatusChar();
                 }
             } else {
                 toDrawL1 = "|";
             }
             if (l2.getLiftLocation() == i) {
-                if (l2.getStatus() != 'N') {
-                    toDrawL2 = "" + l2.getStatus() + "#" + l2.getPeopleInside();
+                if (l2.getStatus() != 3) {
+                    toDrawL2 = "" + l2.getStatusChar() + "#" + l2.getPeopleInside();
                 } else {
-                    toDrawL2 = "" + l2.getStatus();
+                    toDrawL2 = "" + l2.getStatusChar();
                 }
             } else {
                 toDrawL2 = "|";
@@ -259,12 +270,12 @@ public class Controller extends Thread {
             } else {
                 toDrawButton = "No";
             }
-            /*if (l1.isWorking()) {
-                destList = l1.getListOfPeopleToFloor(i);
+            if (l1.isWorking()) {
+                destList = l1.getListOfPeopleToStop(i);
             } else {
-                destList = l2.getListOfPeopleToFloor(i);
-            }*/
-            System.out.println(i + "        " + toDrawL1 + "        " + toDrawL2 + "          " + toDrawButton + "           " + destList);
+                destList = l2.getListOfPeopleToStop(i);
+            }
+            System.out.println(i + "\t" + toDrawL1 + "\t" + toDrawL2 + "\t\t" + toDrawButton + "\t\t" + destList);
         }
     }
 
