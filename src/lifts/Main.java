@@ -34,7 +34,7 @@ public class Main {
         for (int i = 1; i <= 100; i++) {
             new Person("P" + i, r.nextInt(20), r.nextInt(20), c);
             try {
-                sleep(500);
+                sleep(1000);
             } catch (InterruptedException ex) {
                 System.out.println("InterruptedException caught in Main main()");
             }

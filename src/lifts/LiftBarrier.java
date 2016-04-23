@@ -35,7 +35,7 @@ public class LiftBarrier {
      */
     public synchronized void arrive(int stop) {
         peopleWaiting.add(stop);
-        //System.out.println("Person is now waiting for stop " + stop);
+        System.out.println("Person is now waiting for stop " + stop);
         if ((event && (floorReached == stop)) || (event && broken)) {
             return;
         }
@@ -78,7 +78,7 @@ public class LiftBarrier {
         event = true;
         broken = true;
         notifyAll();
-        while ((!peopleWaiting.isEmpty()) && (!broken)) {//will wait for everyone to leave and then wait to be fixed
+        while ((!peopleWaiting.isEmpty()) || (broken)) {//will wait for everyone to leave and then wait to be fixed
             try {
                 this.wait();
             } catch (InterruptedException ie) {

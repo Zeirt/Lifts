@@ -81,6 +81,16 @@ public class Lift extends Thread {
     public void setRides(boolean[] rides) {
         toRide = rides;
     }
+    
+    /**
+     * Set all stops to false.
+     * Used when the lift breaks and kicks everyone out.
+     */
+    public void cleanStops() {
+        for(int i = 0; i < 21; i++) {
+        toStop[i] = false;
+        }
+    }
 
     /**
      * Signal incoming and outcoming people that doors are open.
@@ -214,7 +224,7 @@ public class Lift extends Thread {
      * @param floor to wait in
      */
     public void requestFloor(int floor) {
-        //System.out.println("I got a request to get to floor " + floor);
+        System.out.println("I got a request to get to floor " + floor);
         synchronized (this) {
             toRide[floor] = true;
             notifyAll();
@@ -228,7 +238,7 @@ public class Lift extends Thread {
      * @param floor to get off at
      */
     public void requestStop(int floor) {
-        //System.out.println("Someone wants to get off at floor " + floor);
+        System.out.println("Someone wants to get off at floor " + floor);
         synchronized (this) {
             toStop[floor] = true;
             notifyAll();
@@ -378,24 +388,26 @@ public class Lift extends Thread {
     }
 
     /**
-     * Run method separated in several status. When stopped, it will open doors
-     * and then close them once people have finished going in and out. After
-     * that, it will check where to go, based on if's last gone up or down. If,
-     * at any point it notices it's broken, it will break out of this behavior.
-     * Once it's found a destination, it will set the status as up or down When
-     * going up, it will wait 0.5s and then increase the floor it's in. It will
-     * stop if it's broken or when it's reached its destination. The behaviour
-     * is basically the same when going down. If it breaks, it will open the
-     * doors, issuing that it's broken to kick everyone out, and then wait until
-     * it's fixed back to stopped.
+     * Run method separated in several status. 
+     * When stopped, it will open doors and then close them once people have
+     * finished going in and out. After that, it will check where to go, 
+     * based on if's last gone up or down. If, at any point it notices it's 
+     * broken, it will break out of this behavior. Once it's found a destination,
+     * it will set the status as up or down 
+     * When going up, it will wait 0.5s and then increase the floor it's in. 
+     * It will stop if it's broken, when it's reached its destination or when 
+     * movements have been exhausted.
+     * The behaviour is basically the same when going down. 
+     * If it breaks, it will open the doors, issuing that it's broken to 
+     * kick everyone out, and then wait until it's fixed back to stopped.
      */
     public void run() {
         while (!controller.areMovementsExhausted()) {
             switch (status) {
                 case STOPPED: {
-                    //System.out.println("Lift opening doors");
+                    System.out.println(id + " opening doors");
                     openDoors();
-                    //System.out.println("Lift closing doors");
+                    System.out.println(id + " Lift closing doors");
                     closeDoors();
                     if (status == BROKEN) {
                         break;//if broken, get out of here
@@ -411,9 +423,9 @@ public class Lift extends Thread {
                         case GOING_DOWN: {
                             nextDestination = getNearestDestDown();
                             if (nextDestination == -1) {//destination not valid
-                                //System.out.println("Lift checking where to go");
+                                System.out.println(id + "  checking where to go");
                                 nextDestination = getNearestDest();
-                                //System.out.println("Lift decided where to go");
+                                System.out.println(id + "  decided where to go");
                             }
                             break;
                         }
@@ -421,7 +433,7 @@ public class Lift extends Thread {
                     if (status == BROKEN) {
                         break;//if broken, get out of here
                     }
-                    //System.out.println("Lift going to move");
+                    System.out.println(id + "  going to move");
                     if (nextDestination > position) {
                         if (status == BROKEN) {
                             break;//if broken, get out of here
@@ -444,8 +456,9 @@ public class Lift extends Thread {
                         }
                         position++;
                         controller.movementUp();
-                        //System.out.println("Lift moved to floor " + position);
+                        System.out.println(id + "  moved to floor " + position);
                     }
+                    if(status == BROKEN) break;//get out of here if broken
                     lastDirection = GOING_UP;
                     toStop[position] = false;
                     toRide[position] = false;
@@ -461,8 +474,9 @@ public class Lift extends Thread {
                         }
                         position--;
                         controller.movementUp();
-                        //System.out.println("Lift moved to floor " + position);
+                        System.out.println(id + "  moved to floor " + position);
                     }
+                    if(status == BROKEN) break;//get out of here if broken
                     lastDirection = GOING_DOWN;
                     toStop[position] = false;
                     toRide[position] = false;
@@ -470,7 +484,9 @@ public class Lift extends Thread {
                     break;
                 }
                 case BROKEN: {
+                    System.out.println(id + "  going to kick people out");
                     openDoorsBroken();
+                    cleanStops();
                     closeDoors();
                 }
             }
