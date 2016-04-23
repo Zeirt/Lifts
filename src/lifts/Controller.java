@@ -214,6 +214,12 @@ public class Controller extends Thread {
                 }
             }
         }
+        //check again. Lift may have changed
+        if (l1.isWorking()) {
+            liftToUse = l1;
+        } else {
+            liftToUse = l2;
+        }
         liftToUse.requestFloor(floor);
     }
 

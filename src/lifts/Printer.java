@@ -18,7 +18,7 @@ public class Printer extends Thread{
         while (true) {
             c.drawState();
             try {
-                sleep(2000);
+                sleep(500);
             } catch (InterruptedException ex) {
                 System.out.println("InterruptedException caught in Printer run()");
             }

@@ -224,7 +224,7 @@ public class Lift extends Thread {
      * @param floor to wait in
      */
     public void requestFloor(int floor) {
-        System.out.println("I got a request to get to floor " + floor);
+        //System.out.println(id + " got a request to get to floor " + floor);
         synchronized (this) {
             toRide[floor] = true;
             notifyAll();
@@ -238,7 +238,7 @@ public class Lift extends Thread {
      * @param floor to get off at
      */
     public void requestStop(int floor) {
-        System.out.println("Someone wants to get off at floor " + floor);
+        //System.out.println("Someone wants to get off at floor " + floor);
         synchronized (this) {
             toStop[floor] = true;
             notifyAll();
@@ -405,35 +405,36 @@ public class Lift extends Thread {
         while (!controller.areMovementsExhausted()) {
             switch (status) {
                 case STOPPED: {
-                    System.out.println(id + " opening doors");
+                    //System.out.println(id + " opening doors");
                     openDoors();
-                    System.out.println(id + " Lift closing doors");
+                    //System.out.println(id + " closing doors");
                     closeDoors();
                     if (status == BROKEN) {
                         break;//if broken, get out of here
                     }
+                    //System.out.println(id + " checking where to go");
                     switch (lastDirection) {
                         case GOING_UP: {
                             nextDestination = getNearestDestUp();
                             if (nextDestination == 21) {//destination not valid
                                 nextDestination = getNearestDest();
                             }
+                            //System.out.println(id + " decided to go to " + nextDestination);
                             break;
                         }
                         case GOING_DOWN: {
                             nextDestination = getNearestDestDown();
                             if (nextDestination == -1) {//destination not valid
-                                System.out.println(id + "  checking where to go");
                                 nextDestination = getNearestDest();
-                                System.out.println(id + "  decided where to go");
                             }
+                            //System.out.println(id + " decided to go to " + nextDestination);
                             break;
                         }
                     }
                     if (status == BROKEN) {
                         break;//if broken, get out of here
                     }
-                    System.out.println(id + "  going to move");
+                    //System.out.println(id + "  going to move");
                     if (nextDestination > position) {
                         if (status == BROKEN) {
                             break;//if broken, get out of here
@@ -456,7 +457,7 @@ public class Lift extends Thread {
                         }
                         position++;
                         controller.movementUp();
-                        System.out.println(id + "  moved to floor " + position);
+                        //System.out.println(id + " moved to floor " + position);
                     }
                     if(status == BROKEN) break;//get out of here if broken
                     lastDirection = GOING_UP;
@@ -474,7 +475,7 @@ public class Lift extends Thread {
                         }
                         position--;
                         controller.movementUp();
-                        System.out.println(id + "  moved to floor " + position);
+                        //System.out.println(id + " moved to floor " + position);
                     }
                     if(status == BROKEN) break;//get out of here if broken
                     lastDirection = GOING_DOWN;
@@ -484,7 +485,7 @@ public class Lift extends Thread {
                     break;
                 }
                 case BROKEN: {
-                    System.out.println(id + "  going to kick people out");
+                    //System.out.println(id + " going to kick people out");
                     openDoorsBroken();
                     cleanStops();
                     closeDoors();
