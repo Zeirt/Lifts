@@ -1,5 +1,6 @@
 package lifts;
 
+import java.io.PrintWriter;
 import java.util.Random;
 
 /**
@@ -15,6 +16,7 @@ public class Controller extends Thread {
     private FloorBarrier[] floors;
     private LiftBarrier bl1;
     private LiftBarrier bl2;
+    private PrintWriter printOut;
     private int movementsDone;//will count until 100 to finish
 
     /**
@@ -23,13 +25,15 @@ public class Controller extends Thread {
      * @param l1 first lift
      * @param l2 second lift
      * @param floors array of floors
+     * @param printOut reference for file printer
      */
-    public Controller(Lift l1, Lift l2, FloorBarrier[] floors) {
+    public Controller(Lift l1, Lift l2, FloorBarrier[] floors, PrintWriter printOut) {
         this.l1 = l1;
         this.l2 = l2;
         this.floors = floors;
         bl1 = new LiftBarrier();
         bl2 = new LiftBarrier();
+        this.printOut = printOut;
         movementsDone = 0;
     }
 
@@ -118,8 +122,8 @@ public class Controller extends Thread {
      *
      * @param floor to raise event in
      */
-    public void raiseArrivalInFloor(int floor) {
-        floors[floor].raiseArrival();
+    public void raiseArrivalInFloor(int floor, Lift l) {
+        floors[floor].raiseArrival(l);
     }
 
     /**
@@ -148,6 +152,18 @@ public class Controller extends Thread {
             bl2.raiseBroken();
         }
     }
+    
+    /**
+     * Raise event of finishing lift. Everyone must leave
+     * @param id  of lift
+     */
+    public void raiseFinishInLift(String id){
+        if (id.equals("l1")) {
+            bl1.raiseEnding();
+        } else {
+            bl2.raiseEnding();
+        }
+    }
 
     /**
      * Person gets inside elevator.
@@ -156,27 +172,26 @@ public class Controller extends Thread {
      * @return id of elevator they're in.
      */
     public synchronized String enterElevator(Person p) {
-        if (l1.isWorking()) {
-            while (l1.isFull()) {
-                try {
+        Lift workingLift = getWorkingLift();
+        while(workingLift.isFull()){
+            try {
                     this.wait();
-                } catch (InterruptedException ex) {
-                    System.out.println("InterruptedException caught in Controller enterElevator()");
-                }
+                    workingLift = getWorkingLift();//check again
+            } catch (InterruptedException ex) {
+                System.out.println("InterruptedException caught in Controller enterElevator()");
             }
-            l1.enter(p);
-            return "l1";
-        } else {
-            while (l2.isFull()) {
-                try {
-                    this.wait();
-                } catch (InterruptedException ex) {
-                    System.out.println("InterruptedException caught in Controller enterElevator()");
-                }
-            }
-            l2.enter(p);
-            return "l2";
         }
+        workingLift.enter(p);
+        return workingLift.getLiftId();
+    }
+    
+    /**
+     * Gives back the lift working at that moment
+     * @return lift
+     */
+    public Lift getWorkingLift(){
+        if(l1.isWorking()) return l1;
+        else return l2;
     }
 
     /**
@@ -254,70 +269,34 @@ public class Controller extends Thread {
                 System.out.println("InterruptedException caught in Controller run()");
             }
             if (l1.isWorking()) {
-                //System.out.println("Lift1 breaks. L2 now in operation");
+                System.out.println("Lift1 breaks. L2 now in operation");
+                printOut.println("Lift1 breaks. L2 now in operation");
                 l1.breakLift();
+                try{
+                    sleep(300);//wait for a bit for it to kick everyone out
+                }catch (InterruptedException e) {
+                System.out.println("InterruptedException caught in Controller run()");
+                }
                 stopSwap = l1.getRides();
                 l2.setRides(stopSwap);
                 l2.fixLift();
                 bl2.fixLift();
             } else {
-                //System.out.println("Lift2 breaks. L1 now in operation");
+                System.out.println("Lift2 breaks. L1 now in operation");
+                printOut.println("Lift2 breaks. L1 now in operation");
                 l2.breakLift();
+                try{
+                    sleep(300);//wait for a bit for it to kick everyone out
+                }catch (InterruptedException e) {
+                System.out.println("InterruptedException caught in Controller run()");
+                }
                 stopSwap = l2.getRides();
                 l1.setRides(stopSwap);
                 l1.fixLift();
                 bl1.fixLift();
             }
         }
+        System.out.println("Lifts aren't going to move any more. Please terminate the program.");
+        printOut.println("Lifts aren't going to move any more. Please terminate the program.");
     }
-
-    public void drawState() {
-        String toDrawL1;// | if not there. Else status + # + numPeople
-        String toDrawL2;
-        String toDrawButton;//Yes if pressed. No if not pressed
-        String peopleToLeave;//Makes a list of people who want to get off at that floor
-        String destList = "";
-        System.out.println("Floor:  Lift1:   Lift2:   ButtonPressed?:    Destination: ");
-        for (int i = 20; i >= 0; i--) {
-            if (l1.getLiftLocation() == i) {
-                if (l1.getStatus() != 3) {
-                    toDrawL1 = "" + l1.getStatusChar() + "#" + l1.getPeopleInside();
-                } else {
-                    toDrawL1 = "" + l1.getStatusChar();
-                }
-            } else {
-                toDrawL1 = "|";
-            }
-            if (l2.getLiftLocation() == i) {
-                if (l2.getStatus() != 3) {
-                    toDrawL2 = "" + l2.getStatusChar() + "#" + l2.getPeopleInside();
-                } else {
-                    toDrawL2 = "" + l2.getStatusChar();
-                }
-            } else {
-                toDrawL2 = "|";
-            }
-            if (l1.isWorking()) {
-                if (l1.isRideCalled(i)) {
-                    toDrawButton = "Yes";
-                } else {
-                    toDrawButton = "No";
-                }
-            } else if (l2.isRideCalled(i)) {
-                toDrawButton = "Yes";
-            } else {
-                toDrawButton = "No";
-            }
-            if (l1.isWorking()) {
-                destList = l1.getListOfPeopleToStop(i);
-            } else {
-                destList = l2.getListOfPeopleToStop(i);
-            }
-            System.out.println(i + "\t" + toDrawL1 + "\t" + toDrawL2 + "\t\t" + toDrawButton + "\t\t" + destList);
-        }
-        /*if(areMovementsExhausted()){
-            System.out.println("Lifts will stop moving now.");
-        }*/
-    }
-
 }

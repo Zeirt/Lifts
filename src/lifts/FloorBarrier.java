@@ -11,6 +11,7 @@ public class FloorBarrier {
 
     private int peopleWaiting;
     private boolean event;
+    private Lift currentLift;
 
     /**
      * Constructor of FloorBarrier. Starts off empty with no events.
@@ -29,25 +30,28 @@ public class FloorBarrier {
         if (event) {
             return;
         }
-        while (!event) {
-            try {
-                this.wait();//person will wait in queue!
-            } catch (InterruptedException ie) {
-                System.out.println("InterruptedException caught in FloorBarrier arrive()");
-            }
-        }
+        do{//don't move until event is issued PLUS the lift is not empty
+            while (!event) {
+                try {
+                    this.wait();//person will wait in queue!
+                } catch (InterruptedException ie) {
+                    System.out.println("InterruptedException caught in FloorBarrier arrive()");
+                }
+            } 
+        }while(currentLift.isFull());
     }
 
     /**
      * Event raised (elevator door opening).
      */
-    public synchronized void raiseArrival() {
+    public synchronized void raiseArrival(Lift l) {
         if (event) {
             return;
         }
+        currentLift = l;
         event = true;
         notifyAll();
-        while (peopleWaiting != 0) {
+        while (peopleWaiting != 0 && !l.isFull()) {//leave when floor empty or lift full
             try {
                 this.wait();//lift will wait in queue!
             } catch (InterruptedException ie) {
@@ -62,7 +66,7 @@ public class FloorBarrier {
      */
     public synchronized void exit() {
         peopleWaiting--;
-        if (peopleWaiting == 0) {//if nobody's waiting to get in, tell
+        if(currentLift.isFull() || peopleWaiting == 0){
             notifyAll();
         }
     }

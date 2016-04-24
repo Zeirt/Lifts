@@ -47,6 +47,14 @@ public class Lift extends Thread {
             toStop[i] = false;
         }
     }
+    
+    /**
+     * Get id of lift
+     * @return id of lift
+     */
+    public String getLiftId(){
+        return id;
+    }
 
     /**
      * Set status as broken
@@ -98,8 +106,8 @@ public class Lift extends Thread {
     public void openDoors() {
         doorsOpen = true;
         controller.raiseArrivalInLift(id, position);
-        if (status != BROKEN) {//only let people in if it still works
-            controller.raiseArrivalInFloor(position);
+        if (status != BROKEN && !isFull()) {//only let people in if it still works and not full
+            controller.raiseArrivalInFloor(position, this);
         }
     }
 
@@ -109,6 +117,11 @@ public class Lift extends Thread {
     public void openDoorsBroken() {
         doorsOpen = true;
         controller.raiseBrokenInLift(id);
+    }
+    
+    public void openDoorsFinish() {
+        doorsOpen = true;
+        controller.raiseFinishInLift(id);
     }
 
     /**
@@ -492,5 +505,6 @@ public class Lift extends Thread {
                 }
             }
         }
+        openDoorsFinish();//to kick everyone out before finishing
     }
 }

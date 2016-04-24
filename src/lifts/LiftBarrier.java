@@ -89,6 +89,15 @@ public class LiftBarrier {
     }
 
     /**
+     * Event raised (lift is ending). The event doesn't end.
+     */
+    public synchronized void raiseEnding() {
+        event = true;
+        broken = true;
+        notifyAll();
+    }
+    
+    /**
      * Person signals they got off the barrier.
      *
      * @param floor they wanted to get off at
