@@ -5,9 +5,11 @@ import static java.lang.Thread.sleep;
 
 /**
  * Periodically prints the status of the building.
+ *
  * @author Beatriz Cortés Sánchez
  */
-public class Printer extends Thread{
+public class Printer extends Thread {
+
     private Controller c;
     private Lift l1;
     private Lift l2;
@@ -21,6 +23,9 @@ public class Printer extends Thread{
         this.start();
     }
 
+    /**
+     * Calls drawState() every 0.5s until lifts stop.
+     */
     public void run() {
         while (!c.areMovementsExhausted()) {
             drawState();
@@ -32,7 +37,10 @@ public class Printer extends Thread{
         }
     }
     
-        public void drawState() {
+    /**
+     * Draws in the screen and the .txt file the status of the system.
+     */
+    public void drawState() {
         String toDrawL1;// | if not there. Else status + # + numPeople
         String toDrawL2;
         String toDrawButton;//Yes if pressed. No if not pressed
@@ -79,7 +87,7 @@ public class Printer extends Thread{
             printOut.println(i + "\t" + toDrawL1 + "\t" + toDrawL2 + "\t\t" + toDrawButton + "\t\t" + destList);
         }
         /*if(areMovementsExhausted()){
-            System.out.println("Lifts will stop moving now.");
-        }*/
+         System.out.println("Lifts will stop moving now.");
+         }*/
     }
 }

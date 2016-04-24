@@ -45,6 +45,8 @@ public class Main {
         c.start();
         //create and start printer
         Printer sd = new Printer(c, l1, l2, printOut);
+        //Create and start monitor
+        Monitor m = new Monitor(c, l1, l2);
         Random r = new Random();
         //make a random person every 1s
         for (int i = 1; i <= 100; i++) {
