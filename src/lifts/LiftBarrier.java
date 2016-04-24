@@ -106,7 +106,7 @@ public class LiftBarrier {
     public synchronized void fixLift() {
         broken = false;
         do{
-            notify();
+            notifyAll();
         }while(!peopleWaiting.isEmpty());
     }
 

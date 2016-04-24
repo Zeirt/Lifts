@@ -15,7 +15,7 @@ public class Printer extends Thread{
     }
 
     public void run() {
-        while (true) {
+        while (!c.areMovementsExhausted()) {
             c.drawState();
             try {
                 sleep(500);

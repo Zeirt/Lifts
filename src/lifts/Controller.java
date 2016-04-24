@@ -182,8 +182,8 @@ public class Controller extends Thread {
     /**
      * Person gets out of elevator.
      */
-    public synchronized void exitElevator(Person p, int floor) {
-        if (!l1.isEmpty()) {
+    public synchronized void exitElevator(Person p, int floor, String lift) {
+        if (lift.equals("l1")) {
             l1.exit(floor, p);
             p.setPosition(l1.getLiftLocation());
         } else {
@@ -254,14 +254,14 @@ public class Controller extends Thread {
                 System.out.println("InterruptedException caught in Controller run()");
             }
             if (l1.isWorking()) {
-                System.out.println("Lift1 breaks. L2 now in operation");
+                //System.out.println("Lift1 breaks. L2 now in operation");
                 l1.breakLift();
                 stopSwap = l1.getRides();
                 l2.setRides(stopSwap);
                 l2.fixLift();
                 bl2.fixLift();
             } else {
-                System.out.println("Lift2 breaks. L1 now in operation");
+                //System.out.println("Lift2 breaks. L1 now in operation");
                 l2.breakLift();
                 stopSwap = l2.getRides();
                 l1.setRides(stopSwap);
@@ -315,9 +315,9 @@ public class Controller extends Thread {
             }
             System.out.println(i + "\t" + toDrawL1 + "\t" + toDrawL2 + "\t\t" + toDrawButton + "\t\t" + destList);
         }
-        if(areMovementsExhausted()){
+        /*if(areMovementsExhausted()){
             System.out.println("Lifts will stop moving now.");
-        }
+        }*/
     }
 
 }

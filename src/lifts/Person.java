@@ -71,7 +71,7 @@ public class Person extends Thread {
             //System.out.println("I'm " + id + " and I want to go to floor " + destination);
             controller.callStop(destination, liftRef);
             //System.out.println("I'm " + id + " and I'm leaving the elevator.");
-            controller.exitElevator(this, destination);
+            controller.exitElevator(this, destination, liftRef);
         }
     }
 
