@@ -11,7 +11,7 @@ import java.net.Socket;
  *
  * @author Beatriz Cortés Sánchez
  */
-public class monitorClient {
+public class MonitorClient {
 
     public static void main(String args[]) {
         Socket client;
