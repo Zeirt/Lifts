@@ -296,7 +296,7 @@ public class Controller extends Thread {
                 bl1.fixLift();
             }
         }
-        System.out.println("Lifts aren't going to move any more. Please terminate the program.");
-        printOut.println("Lifts aren't going to move any more. Please terminate the program.");
+        System.out.println("Lifts aren't going to move any more.");
+        printOut.println("Lifts aren't going to move any more.");
     }
 }

@@ -48,17 +48,26 @@ public class Main {
         //Create and start monitor
         Monitor m = new Monitor(c, l1, l2);
         Random r = new Random();
-        //make a random person every 1s
+        //make a random person every 0.5s - 2s
         for (int i = 1; i <= 100; i++) {
             new Person("P" + i, r.nextInt(20), r.nextInt(20), c, printOut);
             try {
-                sleep(2000);
+                sleep(r.nextInt(2000 - 500) + 500);
             } catch (InterruptedException ex) {
                 System.out.println("InterruptedException caught in Main main()");
             }
         }
         //There's a chance the lifts will stop moving before everyone has been spawned.
         //If this happens, floors will just get clogged, but the lifts will remain stopped.
+        while(!c.areMovementsExhausted()){
+            //Wait until the lifts are done to close the program forcefuly.
+            try{
+                sleep(500);
+            } catch (InterruptedException ex) {
+                System.out.println("InterruptedException caught in Main main()");
+            }
+        }
+        System.exit(0);
     }
 
 }

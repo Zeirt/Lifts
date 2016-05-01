@@ -16,8 +16,6 @@ public class Monitor extends Thread {
 
     private ServerSocket server;
     private Socket connection;
-    private DataOutputStream output;
-    private DataInputStream input;
     private Controller c;
     private Lift l1;
     private Lift l2;
