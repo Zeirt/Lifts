@@ -413,6 +413,7 @@ public class Lift extends Thread {
      * The behaviour is basically the same when going down. 
      * If it breaks, it will open the doors, issuing that it's broken to 
      * kick everyone out, and then wait until it's fixed back to stopped.
+     * it will check periodically the gateway to see if it should stop.
      */
     public void run() {
         while (!controller.areMovementsExhausted()) {

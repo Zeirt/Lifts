@@ -2,13 +2,12 @@ package Clients;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lifts.InterfaceGateway;
 
 /**
- *
- * @author Beatriz
+ * Window of the controller client to log in.
+ * Will call the controls window once the user has logged in.
+ * @author Beatriz Cortés Sánchez
  */
 public class ControllerClientLogin extends javax.swing.JFrame {
     
@@ -104,6 +103,12 @@ public class ControllerClientLogin extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Check in the gateway if the password is correct.
+     * If it's correct, open the controller window.
+     * If it's not correct, display error message.
+     * @param evt 
+     */
     private void jButtonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLoginActionPerformed
         String pass = new String(jPasswordField1.getPassword()); //unsafe but easy
         jLabelError.setText("");//erase error

@@ -4,8 +4,9 @@ import javax.swing.JFrame;
 import lifts.InterfaceGateway;
 
 /**
- *
- * @author Beatriz
+ * Window for client to manage start and stop of lifts.
+ * Only appears after they've logged in.
+ * @author Beatriz Cortés Sánchez
  */
 public class ControllerClient extends javax.swing.JFrame {
     
@@ -19,6 +20,7 @@ public class ControllerClient extends javax.swing.JFrame {
         initComponents();
         this.gateway = gateway;
         this.login = login;
+        //make login invisible and make this visible
         login.setVisible(false);
         this.setVisible(true);
     }
@@ -89,6 +91,10 @@ public class ControllerClient extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Call for the gateway to close.
+     * @param evt 
+     */
     private void jButtonStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStopActionPerformed
         try {
             gateway.close();
@@ -98,6 +104,10 @@ public class ControllerClient extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButtonStopActionPerformed
 
+    /**
+     * Call for the gateway to open.
+     * @param evt 
+     */
     private void jButtonResumeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResumeActionPerformed
         try {
             gateway.open();
@@ -107,6 +117,10 @@ public class ControllerClient extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButtonResumeActionPerformed
 
+    /**
+     * When the window closes, make the login window visible again.
+     * @param evt 
+     */
     private void formWindowClosed(java.awt.event.WindowEvent evt) {                                  
         login.setVisible(true);
     }  

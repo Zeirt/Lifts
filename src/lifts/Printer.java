@@ -15,6 +15,13 @@ public class Printer extends Thread {
     private Lift l2;
     private PrintWriter printOut;
 
+    /**
+     * Constructor of Printer.
+     * @param c reference to controller
+     * @param l1 reference to lift 1
+     * @param l2 reference to lift 2
+     * @param printOut reference to file
+     */
     public Printer(Controller c, Lift l1, Lift l2, PrintWriter printOut) {
         this.c = c;
         this.l1 = l1;
