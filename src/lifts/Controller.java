@@ -13,6 +13,7 @@ public class Controller extends Thread {
 
     private Lift l1;
     private Lift l2;
+    private StopGateway gateway;
     private FloorBarrier[] floors;
     private LiftBarrier bl1;
     private LiftBarrier bl2;
@@ -24,17 +25,27 @@ public class Controller extends Thread {
      *
      * @param l1 first lift
      * @param l2 second lift
+     * @param gateway gateway reference
      * @param floors array of floors
      * @param printOut reference for file printer
      */
-    public Controller(Lift l1, Lift l2, FloorBarrier[] floors, PrintWriter printOut) {
+    public Controller(Lift l1, Lift l2, StopGateway gateway, FloorBarrier[] floors, PrintWriter printOut) {
         this.l1 = l1;
         this.l2 = l2;
+        this.gateway = gateway;
         this.floors = floors;
         bl1 = new LiftBarrier();
         bl2 = new LiftBarrier();
         this.printOut = printOut;
         movementsDone = 0;
+    }
+    
+    /**
+     * Lift checks if the gateway is open or not.
+     * Will always be open unless a controller is connected.
+     */
+    public synchronized void lookupGateway(){
+        gateway.look();
     }
 
     /**

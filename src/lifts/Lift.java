@@ -419,6 +419,7 @@ public class Lift extends Thread {
             switch (status) {
                 case STOPPED: {
                     //System.out.println(id + " opening doors");
+                    controller.lookupGateway();
                     openDoors();
                     //System.out.println(id + " closing doors");
                     closeDoors();
@@ -426,6 +427,7 @@ public class Lift extends Thread {
                         break;//if broken, get out of here
                     }
                     //System.out.println(id + " checking where to go");
+                    controller.lookupGateway();
                     switch (lastDirection) {
                         case GOING_UP: {
                             nextDestination = getNearestDestUp();
@@ -444,6 +446,7 @@ public class Lift extends Thread {
                             break;
                         }
                     }
+                    controller.lookupGateway();
                     if (status == BROKEN) {
                         break;//if broken, get out of here
                     }
@@ -462,6 +465,7 @@ public class Lift extends Thread {
                     break;
                 }
                 case GOING_UP: {
+                    controller.lookupGateway();
                     while (position != nextDestination && status != BROKEN && !controller.areMovementsExhausted()) {
                         try {
                             sleep(500);
@@ -470,6 +474,7 @@ public class Lift extends Thread {
                         }
                         position++;
                         controller.movementUp();
+                        controller.lookupGateway();
                         //System.out.println(id + " moved to floor " + position);
                     }
                     if(status == BROKEN) break;//get out of here if broken
@@ -480,6 +485,7 @@ public class Lift extends Thread {
                     break;
                 }
                 case GOING_DOWN: {
+                    controller.lookupGateway();
                     while (position != nextDestination && status != BROKEN && !controller.areMovementsExhausted()) {
                         try {
                             sleep(500);
@@ -488,6 +494,7 @@ public class Lift extends Thread {
                         }
                         position--;
                         controller.movementUp();
+                        controller.lookupGateway();
                         //System.out.println(id + " moved to floor " + position);
                     }
                     if(status == BROKEN) break;//get out of here if broken
@@ -498,6 +505,7 @@ public class Lift extends Thread {
                     break;
                 }
                 case BROKEN: {
+                    controller.lookupGateway();
                     //System.out.println(id + " going to kick people out");
                     openDoorsBroken();
                     cleanStops();
